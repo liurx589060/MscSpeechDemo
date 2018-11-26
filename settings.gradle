@@ -1,0 +1,1 @@
+include ':app', ':msclib'//,':speechDemo',":mscV5PlusDemo"

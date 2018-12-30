@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.hc.lib.msc.HCMscParams;
+import com.hc.lib.msc.ISpeechListener;
 import com.hc.lib.msc.MscDefaultSpeech;
 import com.hc.msc.demo.R;
 

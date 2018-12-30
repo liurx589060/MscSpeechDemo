@@ -19,5 +19,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':msclib')
+    //compile project(':msclib')
+    compile(name: 'msclib-release', ext: 'aar')
 }

@@ -24,6 +24,7 @@ public class MscSpeech {
     private String mSpeechText;
     private Context mContext;
     private boolean isLocalError;
+    private ISpeechListener mSpeechListener;
 
     public MscSpeech() {
         mMscParams = new HCMscParams();
@@ -95,6 +96,10 @@ public class MscSpeech {
         return true;
     }
 
+    public void setmSpeechListener(ISpeechListener mSpeechListener) {
+        this.mSpeechListener = mSpeechListener;
+    }
+
     private class MyInitListener implements InitListener{
         private Context mContext;
 
@@ -110,7 +115,10 @@ public class MscSpeech {
                 MscManager.mscStartSpeaking(mContext,mTts,mSpeechText,mMscParams,mTtsListener);
             }else {
                 isMscInitSuccess = false;
-                Toast.makeText(mContext,"InitListener init() code = " + code,Toast.LENGTH_LONG).show();
+
+            }
+            if(mSpeechListener != null) {
+                mSpeechListener.onInit(isMscInitSuccess);
             }
         }
     }
@@ -150,12 +158,18 @@ public class MscSpeech {
             mPercentForPlaying = percent;
             Log.d(TAG,String.format("缓冲进度为%d%%，播放进度为%d%%",
                     mPercentForBuffering, mPercentForPlaying));
+            if(mSpeechListener != null) {
+                mSpeechListener.onProgress(percent,beginPos,endPos);
+            }
         }
 
         @Override
         public void onCompleted(SpeechError error) {
             if (error == null) {
                 Log.i(TAG,"播放完成");
+                if(mSpeechListener != null) {
+                    mSpeechListener.onComplete(null);
+                }
             } else if (error != null) {
                 Log.e(TAG,error.getPlainDescription(true));
                 if(mMscParams.getEngineType().equals(HCMscParams.LOCAL)) {
@@ -164,7 +178,9 @@ public class MscSpeech {
                     startSpeaking(mContext,mSpeechText);
                 }else if (mMscParams.getEngineType().equals(HCMscParams.CLOUND)) {
                     if(isLocalError) {
-                        Toast.makeText(mContext,error.getPlainDescription(true),Toast.LENGTH_LONG).show();
+                        if(mSpeechListener != null) {
+                            mSpeechListener.onComplete(error);
+                        }
                     }else {
                         mMscParams.setEngineType(HCMscParams.LOCAL);
                         startSpeaking(mContext,mSpeechText);
